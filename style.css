@@ -1,0 +1,23 @@
+.game-dialog {
+    display: none; /* Change from block to none */
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.85);
+    border: 2px solid #30beff;
+    border-radius: 10px;
+    color: white;
+    padding: 0;
+    width: 400px;
+    box-shadow: 0 0 20px rgba(48, 190, 255, 0.3);
+    backdrop-filter: blur(5px);
+    font-family: 'Arial', sans-serif;
+    opacity: 0.95;
+    transition: all 0.3s ease;
+}
+
+/* Add hover effect */
+.planet-hover:hover ~ .game-dialog {
+    display: block;
+}

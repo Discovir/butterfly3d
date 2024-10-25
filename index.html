@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Visualization of Disasters</title>
+    <link rel="shortcut icon" type="image/png" href="favicon.ico">
+    
+
+    <style>
+        body { 
+            margin: 0; 
+            overflow: hidden; 
+            font-family: Arial, sans-serif; 
+        }
+
+
+        :root {
+  --glow-rgb: 48 190 255;
+}
+
+
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.glow-point {
+  position: absolute;
+  box-shadow: 0rem 0rem 1.2rem 0.6rem rgb(var(--glow-rgb));
+  pointer-events: none;
+}
+
+.star {
+  position: absolute;
+  z-index: 2;
+  color: white;
+  font-size: 1rem;
+  animation-duration: 1500ms;
+  animation-fill-mode: forwards;
+  pointer-events: none;
+}
+
+@keyframes fall-1 {
+  0% {
+    transform: translate(0px, 0px) rotateX(45deg) rotateY(30deg) rotateZ(0deg) scale(0.25);
+    opacity: 0;
+  }
+  
+  5% {
+    transform: translate(10px, -10px) rotateX(45deg) rotateY(30deg) rotateZ(0deg) scale(1);
+    opacity: 1;
+  }
+  
+  100% {
+    transform: translate(25px, 200px) rotateX(180deg) rotateY(270deg) rotateZ(90deg) scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes fall-2 {
+  0% {
+    transform: translate(0px, 0px) rotateX(-20deg) rotateY(10deg) scale(0.25);
+    opacity: 0;
+  }
+  
+  10% {
+    transform: translate(-10px, -5px) rotateX(-20deg) rotateY(10deg) scale(1);
+    opacity: 1;
+  }
+  
+  100% {
+    transform: translate(-10px, 160px) rotateX(-90deg) rotateY(45deg) scale(0.25);
+    opacity: 0;
+  }
+}
+
+@keyframes fall-3 {
+  0% {
+    transform: translate(0px, 0px) rotateX(0deg) rotateY(45deg) scale(0.5);
+    opacity: 0;
+  }
+  
+  15% {
+    transform: translate(7px, 5px) rotateX(0deg) rotateY(45deg) scale(1);
+    opacity: 1;
+  }
+  
+  100% {
+    transform: translate(20px, 120px) rotateX(-180deg) rotateY(-90deg) scale(0.5);
+    opacity: 0;
+  }
+}
+        canvas { 
+            display: block; 
+        }
+        #info {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        /* Style the links inside the sidenav */
+        #mySidenav a {
+            position: absolute;
+            left: -80px;
+            transition: 0.3s;
+            padding: 15px;
+            width: 100px;
+            text-decoration: none;
+            font-size: 20px;
+            color: white;
+            border-radius: 0 5px 5px 0;
+        }
+
+        #mySidenav a:hover {
+            left: 0;
+        }
+
+        #about {
+            top: 20px;
+            background-color: #dac5ba;
+        }
+
+        #blog {
+            top: 80px;
+            background-color: #ff714f;
+        }
+
+        #projects {
+            top: 140px;
+            background-color: #ca131a;
+        }
+
+        #contact {
+            top: 200px;
+            background-color:#ff9e7d;
+        }
+
+        #leftButton, #rightButton, .texture-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 24px;
+            padding: 10px 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border: 2px solid #00ba9e;
+            color: #00ba9e;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.3s ease;
+            border-radius: 5px;
+        }
+
+        #leftButton:hover, #rightButton:hover, .texture-button:hover {
+            background-color: rgba(48, 190, 255, 0.2);
+            box-shadow: 0 0 15px rgba(48, 190, 255, 0.5);
+        }
+
+        #leftButton { left: 20px; }
+        #rightButton { right: 20px; }
+
+        .texture-button {
+            right: 80px;
+            transform: none;
+        }
+
+        /* Enhanced slider styles */
+        .slider-container {
+            position: fixed;
+            top: 2%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            max-width: 600px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #00ba9e;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .slider{
+            width: 100%;
+            height: 10px;
+            border-radius: 5px;
+            outline: none;
+            opacity: 0.7;
+            transition: opacity .2s;
+        }
+
+        /* Custom slider styles for each planet */
+    
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(48, 190, 255, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        /* Custom thumb styles for each planet */
+        .slider.deforestation::-webkit-slider-thumb {
+            background: #2d5a27;
+        }
+
+        .slider.ocean-pollution::-webkit-slider-thumb {
+            background: #1e90ff;
+        }
+
+        .slider.wildfire::-webkit-slider-thumb {
+            background: #ff4500;
+        }
+
+        .slider.air-pollution::-webkit-slider-thumb {
+            background: #808080;
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            color: #00ba9e;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .current-texture {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .planet-info {
+            color: #00ba9e;
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .texture-description {
+            color: #fff;
+            text-align: center;
+            margin: 10px 0;
+            font-size: 14px;
+            min-height: 40px;
+            transition: all 0.3s ease;
+        }
+
+
+        #dialogBox {
+            display: none;
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            width: 300px;
+            text-align: center;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            opacity: 0;
+        }
+
+        .planet-hover:hover ~ #dialogBox {
+            display: block;
+            opacity: 1;
+            transform: translateX(-50%) translateY(-10px);
+        }
+
+        .dialog-header {
+            background: linear-gradient(90deg, rgba(48, 190, 255, 0.2), transparent);
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid rgba(48, 190, 255, 0.3);
+        }
+
+        .dialog-icon {
+            font-size: 24px;
+            margin-right: 10px;
+        }
+
+        .dialog-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #00ba9e;
+            cursor: pointer;
+        }
+
+        .dialog-content {
+            padding: 20px;
+            line-height: 1.5;
+            font-size: 16px;
+            color: #e0e0e0;
+        }
+  
+        .dialog-footer {
+            padding: 10px;
+            text-align: center;
+            border-top: 1px solid rgba(48, 190, 255, 0.3);
+            font-size: 14px;
+            color: #888;
+        }
+
+        .dialog-prompt {
+            opacity: 0.7;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 0.3; }
+            100% { opacity: 0.7; }
+        }
+
+
+
+        
+        #textureInfoPopup {
+            position: fixed;
+            right: -400px;
+            top: 80%;
+            transform: translateY(-50%);
+            width: 350px;
+            background-color: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ba9e;
+            border-radius: 8px;
+            color: white;
+            padding: 20px;
+            transition: right 0.3s ease;
+            z-index: 1000;
+        }
+
+        #textureInfoPopup.active {
+            right: 20px;
+        }
+
+        .popup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(48, 190, 255, 0.3);
+        }
+
+        .popup-title {
+            font-size: 20px;
+            color: #00ba9e;
+        }
+
+
+        
+        .close-button {
+            background: none;
+            border: none;
+            color: #00ba9e;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+            transition: color 0.3s ease;
+        }
+
+        .close-button:hover {
+            color: #fff;
+        }
+
+        .popup-content {
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .texture-indicator {
+            text-align: right;
+            color: #00ba9e;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div id="info" class="planet-hover">Deforestation</div>
+    <button id="leftButton">&larr; Left</button>
+    <button id="rightButton">Right &rarr;</button>
+  
+   
+</div>
+    <div id="dialogBox" class="game-dialog">
+        <div class="dialog-header">
+            <div class="dialog-icon">🌍</div>
+            <div class="dialog-title" id="planetTitle">Deforestation</div>
+        </div>
+        <div class="dialog-content" id="dialogContent">
+            Deforestation is the large-scale removal of forest, leaving land barren.
+        </div>
+        <div class="dialog-footer">
+            <div class="dialog-prompt">Use Slider Bar to see more Data </div>
+        </div>
+    </div>
+
+    <div id="textureInfoPopup">
+        <div class="popup-header">
+            <div class="popup-title" id="textureTitle">Texture Information</div>
+            <button class="close-button" onclick="closeTexturePopup()">×</button>
+        </div>
+        <div class="popup-content" id="textureContent"></div>
+        <div class="texture-indicator" id="textureIndicator"></div>
+    </div>
+
+
+
+    <div class="slider-container">
+        <div class="planet-info" id="planetInfo">Deforestation</div>
+        <div class="texture-description" id="textureDescription"></div>
+        <div class="current-texture" id="currentTextureLabel"></div>
+        <input type="range" min="0" max="2" value="0" class="slider deforestation" id="textureSlider">
+        <div class="slider-labels" id="sliderLabels"></div>
+    </div>
+
+
+    <div id="mySidenav" class="sidenav">
+        <a href="#" id="about">About</a>
+        <a href="#" id="blog">Blog</a>
+        <a href="#" id="projects">Projects</a>
+        <a href="#" id="contact">Contact</a>
+    </div>
+
+    <!-- Audio elements for each planet -->
+    <audio id="deforestationAudio" preload="auto">
+        <source src="deforestation1.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="oceanPollutionAudio" preload="auto">
+        <source src="pollution.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="wildfireAudio" preload="auto">
+        <source src="wildfire.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="airPollutionAudio" preload="auto">
+        <source src="air.mp3" type="audio/mpeg">
+    </audio>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/Tween.min.js"></script>
+    <script src="krrish.js"></script>
+</body>
+</html>
