@@ -425,7 +425,7 @@ function showTexturePopup(planetIndex, textureIndex) {
     document.getElementById('textureTitle').textContent = textureInfo.title;
     document.getElementById('textureContent').textContent = textureInfo.content;
     document.getElementById('textureIndicator').textContent = 
-        `Texture ${textureIndex + 1} of ${planet.textures.length}`;
+        `Map ${textureIndex + 1} of ${planet.textures.length}`;
     
     document.getElementById('textureInfoPopup').classList.add('active');
 }
@@ -574,7 +574,7 @@ const textureSlider = document.getElementById('textureSlider');
 
         function updateTextureInfo(planet, textureIndex) {
             const textureInfo = planet.textureInfo[textureIndex];
-            currentTextureLabel.textContent = `Texture ${textureIndex + 1}/${planet.textures.length}`;
+            currentTextureLabel.textContent = `Map ${textureIndex + 1}/${planet.textures.length}`;
             textureDescription.textContent = textureInfo.description;
         }
 
